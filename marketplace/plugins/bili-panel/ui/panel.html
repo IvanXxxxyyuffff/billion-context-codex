@@ -279,7 +279,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     $("ver").textContent = d.version ? ("v" + d.version + (d.commit ? " (" + d.commit + ")" : "")) : "";
     $("src").textContent = "数据源：" + (meta && meta.src ? meta.src : "embedded") + (d.origin ? " · " + d.origin : "");
 
-    // dsh 总览第一排：会话 / 请求 / 压缩累计节省 / 净节省
+    // Codex 总览第一排：会话 / 请求 / 压缩累计节省 / 净节省
     $("v-sessions").textContent = fmtInt(o.sessions);
     $("n-sessions").textContent = "live " + fmtInt(o.live || 0) + " / total " + fmtInt(o.sessions || 0);
     $("v-requests").textContent = fmt(o.requests);
@@ -289,7 +289,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     $("v-netsaved").textContent = fmt(o.netSavedTotal);
     $("n-netsaved").textContent = "已扣除折叠后重建与摘要成本";
 
-    // 压缩回本：≈(saved − spent)，子行与 dsh 相同
+    // 压缩回本：≈(saved − spent)，子行与 Codex 相同
     const pay = o.paybackUsdTotal || {};
     const pbNet = Number(pay.saved || 0) - Number(pay.spent || 0);
     const payCard = $("payback-card");
@@ -312,7 +312,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     $("n-hitpct").textContent = hitSub;
     $("bar-hit").style.width = Math.min(100, Number(o.hitPct || 0)) + "%";
 
-    // token 三卡 + 花费卡：金额折算与 dsh 一致
+    // token 三卡 + 花费卡：金额折算与 Codex 一致
     const cu = o.costUsdSplitTotal || {};
     $("v-input").textContent = fmt(o.inputTokens);
     $("n-input").textContent = cu.i !== undefined ? "其中未命中部分折合约 " + usd(cu.i) : "累计输入";
@@ -323,7 +323,7 @@ container holding the app. Specify either width or maxWidth, and either height o
     $("v-spend").textContent = o.hasMoneyData === false ? "—" : usd(o.costUsdTotal);
     $("n-spend").textContent = o.savedUsdTotal ? "折合省钱约 " + usd(o.savedUsdTotal) : "";
 
-    // 按协议分布：dsh 列序
+    // 按协议分布：Codex 列序
     const rows = (o.byProtocol || []).slice().sort((a,b)=>b.sessions-a.sessions || b.requests-a.requests);
     $("tb-protos").innerHTML = rows.length ? rows.map(r => "<tr><td><span class='proto'>" + esc(r.protocol) + "</span></td>" +
       "<td class='num'>" + fmtInt(r.sessions) + "</td><td class='num'>" + fmt(r.requests) + "</td>" +
@@ -353,9 +353,21 @@ container holding the app. Specify either width or maxWidth, and either height o
     $("refresh").textContent = "更新 " + new Date().toLocaleTimeString("zh-CN");
   }
 
+  async function getApps(){
+    if(window.__BILI_APP__) return window.__BILI_APP__;
+    if(window.MCPApps && window.MCPApps.App){
+      try{
+        const a = new window.MCPApps.App();
+        await Promise.race([a.connect(), new Promise((_,rej)=>setTimeout(()=>rej(new Error("connect timeout")),2500))]);
+        window.__BILI_APP__ = a; return a;
+      }catch(e){}
+    }
+    return null;
+  }
   async function viaApp(){
-    if(!APP || !APP.callServerTool) throw new Error("MCPApps 未连接");
-    const res = await APP.callServerTool({ name: "bili_api", arguments: { path: "/__bili/overview" } });
+    const a = await getApps();
+    if(!a || !a.callServerTool) throw new Error("MCPApps 未连接");
+    const res = await a.callServerTool({ name: "bili_api", arguments: { path: "/__bili/overview" } });
     const sc = res && res.structuredContent || {};
     if(sc.error) throw new Error(sc.error);
     return sc.data;
@@ -380,22 +392,27 @@ container holding the app. Specify either width or maxWidth, and either height o
     render(d, { src });
   }
 
-  function openWeb(){
+  async function openWeb(){
     const url = BILI_URL + "/__bili/";
-    try{ if(APP && APP.openLink) { APP.openLink({ url }); return; } }catch(e){}
-    window.open(url, "_blank");
+    try{
+      const a = await getApps();
+      if(a && a.openLink){
+        const r = await a.openLink({ url });
+        if(!(r && r.isError)) return;
+      }
+    }catch(e){}
+    const w = window.open(url, "_blank");
+    if(!w){
+      const el = document.getElementById("err");
+      el.style.display = "block";
+      el.textContent = "宿主沙箱拦截了浏览器跳转；请手动打开 " + url;
+    }
   }
 
   async function init(){
     $("openweb").addEventListener("click", e => { e.preventDefault(); openWeb(); });
     await boot();
-    if(window.MCPApps && window.MCPApps.App && !window.__BILI_APP__){
-      try{
-        const a = new window.MCPApps.App();
-        await Promise.race([a.connect(), new Promise((_,rej)=>setTimeout(()=>rej(new Error("connect timeout")),3000))]);
-        window.__BILI_APP__ = a;
-      }catch(e){}
-    }
+    try{ await getApps(); }catch(e){}
     if(window.__POLL__) clearInterval(window.__POLL__);
     let first = true;
     window.__POLL__ = setInterval(async () => { if(first){ first = false; return; } await boot(); }, 8000);

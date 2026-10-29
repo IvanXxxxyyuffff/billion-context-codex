@@ -20,7 +20,7 @@ try:
         VERSION = _f.read().strip() or "1.0.0"
 except OSError:
     VERSION = "1.0.0"
-UI_URI = "ui://bili-panel/panel4"
+UI_URI = "ui://bili-panel/panel5"
 UI_FILE = os.path.join(HERE, "ui", "panel.html")
 UI_MIME = "text/html;profile=mcp-app"
 
