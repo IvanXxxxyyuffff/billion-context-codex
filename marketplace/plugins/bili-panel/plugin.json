@@ -1,0 +1,29 @@
+{
+  "name": "bili-panel",
+  "version": "1.0.0",
+  "description": "billion-context 上下文管理看板：会话/token/缓存命中率/压缩块/节省量一屏看完。",
+  "author": {
+    "name": "bili-panel"
+  },
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "bili 看板",
+        "shortDescription": "上下文管理：token/缓存/压缩一屏看完",
+        "longDescription": "billion-context 上下文管理看板。展示会话数、请求量、输入 token、缓存命中率、压缩块数、节省量与近期会话；数据源是本地 bili 代理（默认 127.0.0.1:8790）。",
+        "developerName": "bili-panel",
+        "category": "Productivity",
+        "capabilities": [
+          "Interactive",
+          "Read"
+        ],
+        "logo": "./assets/logo.svg",
+        "composerIcon": "./assets/logo.svg",
+        "defaultPrompt": [
+          "打开 bili 看板，看看上下文管理情况"
+        ]
+      }
+    }
+  }
+}

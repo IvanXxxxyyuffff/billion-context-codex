@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "bili-panel": {
+      "command": "python3",
+      "cwd": "${PLUGIN_ROOT}",
+      "args": ["mcp_server.py"],
+      "enabled": true
+    }
+  }
+}

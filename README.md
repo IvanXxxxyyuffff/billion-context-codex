@@ -171,3 +171,31 @@ curl -s http://127.0.0.1:8790/__bili/plugin/manifest | python3 -c "import json,s
 
 - [ranxianglei/billion-context](https://github.com/ranxianglei/billion-context) — 压缩内核（acp-kernel）
 - [Tyan66666/billion-context-dsh](https://github.com/Tyan66666/billion-context-dsh) — 本移植的蓝本
+
+---
+
+## bili-panel 独立插件（v1.0.0）
+
+`marketplace/` 目录是 bili-panel 独立插件市场根。它与 teamboard 完全独立、有自己的压缩漏斗图标。
+
+安装：把 `marketplace/` 指到本地路径，或把仓库克隆到本地后在 `~/.codex/config.toml` 里追加：
+
+```toml
+[plugins."bili-panel@bili-local"]
+enabled = true
+
+[marketplaces.bili-local]
+source_type = "local"
+source = "<repo>/marketplace"
+```
+
+重启 Codex 后，侧边栏出现「bili 看板」（自带压缩漏斗图标）；对话里喊「打开 bili 看板」也能内嵌打开。
+
+启动 bili 代理：
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+bili start --port 8790
+```
+
+指标：会话 / 请求 / 输入 token / 缓存命中率 / 压缩块 / 节省 token / 花费 / 压缩节省（USD）+ 近期会话列表。
