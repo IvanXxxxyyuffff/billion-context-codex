@@ -246,7 +246,7 @@ function setHealth(hitPct){
 
 function render(o, meta){
   document.getElementById("sub").textContent =
-    "billion-context · " + (meta && meta.version ? "v" + meta.version : "") + (meta && meta.origin ? " · " + meta.origin.replace(/^https?:\/\//,"") : "");
+    "billion-context · " + (meta && meta.version ? "v" + meta.version : "") + (meta && meta.origin ? " · " + meta.origin.replace(/^https?:\/\//,"") : "") + (meta && meta.src ? " · " + meta.src : "");
   const pay = o.paybackUsdTotal || {};
   const miss = o.missSplitUsdTotal || {};
   document.getElementById("v-sessions").textContent = fmt(o.sessions);
