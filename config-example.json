@@ -1,0 +1,267 @@
+{
+  "compress": {
+    "modelContextLimit": 1000000,
+    "maxContextLimit": "25%",
+    "emergencyThresholdPercent": "85%",
+    "nudgeGrowthTokens": "<REDACTED>",
+    "preserveRecentMessages": 16,
+    "preserveRecentTokens": "<REDACTED>",
+    "minCompressRangeChars": 20000,
+    "outputHeadroomMaxPct": 0.1,
+    "tierNudgeTokens": "<REDACTED>",
+    "minPressureBenefitTokens": "<REDACTED>",
+    "protectedLatestTools": [
+      "todo_write",
+      "team_task_update",
+      "agent_teams_update_task",
+      "agent_teams_claim_task"
+    ],
+    "neverPreserveRecentTools": [],
+    "preserveRecentTools": [
+      "read",
+      "read_image",
+      "grep",
+      "glob",
+      "run_code",
+      "bash"
+    ],
+    "absorb": {
+      "enabled": false
+    },
+    "ccr": {
+      "enabled": true,
+      "minToolTokens": "<REDACTED>",
+      "toolName": "acp_retrieve",
+      "maxHeadChars": 200
+    },
+    "search": {
+      "planAware": true
+    },
+    "outputSteering": {
+      "enabled": true,
+      "verbosityLevel": 3
+    },
+    "priceProfile": {
+      "w": 1,
+      "r": 0.1,
+      "q": 1.5
+    },
+    "reasoning": {
+      "drop": false
+    },
+    "reconcile": "repair",
+    "nudgeModelDecided": true,
+    "nudgeDecisionMaxTokens": "<REDACTED>"
+  },
+  "providers": {
+    "http://127.0.0.1:3425/v1": {
+      "models": {
+        "sensenova/deepseek-v4-flash": {
+          "context": 1048576,
+          "output": 384000
+        },
+        "sensenova/sensenova-6.8-flash-lite": {
+          "context": 262144,
+          "output": 65536
+        },
+        "sensenova/deepseek-v4.1-flash": {
+          "context": 1048576,
+          "output": 384000
+        },
+        "codex/gpt-6.1-sol": {
+          "context": 500000,
+          "output": 128000
+        },
+        "codex/gpt-6-astra": {
+          "context": 272000,
+          "output": 70464
+        },
+        "codex/gpt-6-sol": {
+          "context": 272000,
+          "output": 70464
+        },
+        "codex/gpt-6-luna": {
+          "context": 272000,
+          "output": 70464
+        },
+        "codex/gpt-5.6-sol": {
+          "context": 272000,
+          "output": 70464
+        },
+        "codex/gpt-5.6-terra": {
+          "context": 272000,
+          "output": 70464
+        },
+        "codex/gpt-5.6-luna": {
+          "context": 272000,
+          "output": 70464
+        },
+        "auto/deepseek-v4.1-flash": {
+          "context": 1048576,
+          "output": 384000
+        },
+        "auto/glm-5.3-flash": {
+          "context": 1000000,
+          "output": 131072
+        },
+        "workbuddy-2/hy3": {
+          "context": 192000,
+          "output": 48000
+        },
+        "workbuddy-2/deepseek-v4.1-flash": {
+          "context": 1000000,
+          "output": 128000
+        },
+        "workbuddy-2/glm-5.3-flash": {
+          "context": 1000000,
+          "output": 131072
+        },
+        "workbuddy-2/step-5-preview": {
+          "context": 1000000,
+          "output": 64000
+        },
+        "workbuddy-2/space-bunny": {
+          "context": 1000000,
+          "output": 128000
+        },
+        "workbuddy-2/minimax-m3.1-flash": {
+          "context": 1000000,
+          "output": 128000
+        },
+        "workbuddy-2/mimo-v2.6-pro": {
+          "context": 1000000,
+          "output": 128000
+        },
+        "opencode-zen-free/flint-40b-free": {
+          "context": 262144,
+          "output": 65536
+        },
+        "opencode-zen-free/big-pickle": {
+          "context": 160000,
+          "output": 32000
+        },
+        "opencode-zen-free/beam-free": {
+          "context": 1048576,
+          "output": 131072
+        },
+        "opencode-zen-free/mimo-v2.6-flash-free": {
+          "context": 200000,
+          "output": 32000
+        },
+        "opencode-zen-free/nemotron-3.5-super-vl-free": {
+          "context": 1048576,
+          "output": 131072
+        },
+        "opencode-zen-free/nemotron-3.5-lightning-free": {
+          "context": 262144,
+          "output": 65536
+        },
+        "opencode-zen-free/deepseek-v4.1-flash-free": {
+          "context": 200000,
+          "output": 32000
+        },
+        "opencode-zen-free/glm-5.3-flash-free": {
+          "context": 200000,
+          "output": 32000
+        },
+        "cline/cline-free/nemotron-3.5-super-vl": {
+          "context": 1048576,
+          "output": 458752
+        },
+        "cline/cline-free/solar-mini4": {
+          "context": 524288,
+          "output": 131072
+        },
+        "cline/xingchen-agi/xing4.0-29b-a4b:free": {
+          "context": 262144,
+          "output": 65536
+        },
+        "cline/nvidia/nemotron-3.5-super-vl:free": {
+          "context": 1000000,
+          "output": 131072
+        },
+        "cline/dots-studio/dots-3-note-preview:free": {
+          "context": 512000,
+          "output": 190464
+        },
+        "cline/liquid/lfm-2.5-2.6b:free": {
+          "context": 65536,
+          "output": 8192
+        },
+        "cline/nvidia/nemotron-3.5-lightning:free": {
+          "context": 1000000,
+          "output": 65536
+        },
+        "cline/thinkingmachines/inkling-small:free": {
+          "context": 1048576,
+          "output": 262144
+        },
+        "cline/poolside/laguna-s-2.1:free": {
+          "context": 262144,
+          "output": 32768
+        },
+        "cline/thinkingmachines/inkling:free": {
+          "context": 1048576,
+          "output": 262144
+        },
+        "cline/poolside/laguna-xs-2.1:free": {
+          "context": 262144,
+          "output": 32768
+        },
+        "cline/cohere/north-mini-code:free": {
+          "context": 256000,
+          "output": 64000
+        },
+        "cline/nvidia/nemotron-3.5-content-safety:free": {
+          "context": 128000,
+          "output": 8192
+        },
+        "cline/nvidia/nemotron-3-ultra-550b-a55b:free": {
+          "context": 1000000,
+          "output": 65536
+        },
+        "cline/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+          "context": 256000,
+          "output": 64000
+        },
+        "cline/google/gemma-4-26b-a4b-it:free": {
+          "context": 262144,
+          "output": 32768
+        },
+        "cline/google/gemma-4-31b-it:free": {
+          "context": 262144,
+          "output": 32768
+        },
+        "cline/nvidia/nemotron-3-super-120b-a12b:free": {
+          "context": 262144,
+          "output": 65536
+        },
+        "cline/openrouter/free": {
+          "context": 200000,
+          "output": 32768
+        },
+        "trae-cn/deepseek-v4.1-flash-max": {
+          "context": 1000000,
+          "output": 64000
+        },
+        "trae-cn/glm-5.3-flash-max": {
+          "context": 1000000,
+          "output": 64000
+        },
+        "trae-cn/minimax-m3.1-flash-max": {
+          "context": 1000000,
+          "output": 64000
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "invariantJudge": false
+  },
+  "storage": {
+    "unified": "legacy"
+  },
+  "sessions": {
+    "residentMaxBytes": 1610612736
+  }
+}
