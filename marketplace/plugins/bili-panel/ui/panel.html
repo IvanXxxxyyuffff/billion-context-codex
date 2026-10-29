@@ -77,24 +77,28 @@ tr:hover td{background:rgba(255,255,255,.028)}
 
   <div class="grid" id="cards">
     <div class="card c1"><div class="k">会话</div><div class="v" id="v-sessions">—</div><div class="n" id="n-sessions">live — / total —</div></div>
-    <div class="card c2"><div class="k">总请求数</div><div class="v" id="v-requests">—</div><div class="n">累计请求量</div></div>
+    <div class="card c2"><div class="k">请求总数</div><div class="v" id="v-requests">—</div><div class="n">累计请求量</div></div>
     <div class="card c3"><div class="k">输入 token</div><div class="v" id="v-input">—</div><div class="n">累计输入</div></div>
-    <div class="card c4"><div class="k">缓存命中</div><div class="v" id="v-cached">—</div><div class="n" id="n-cached">命中率 —</div><div class="bar"><i id="bar-hit" style="width:0%"></i></div></div>
-    <div class="card c5"><div class="k">压缩块</div><div class="v" id="v-blocks">—</div><div class="n">folds</div></div>
-    <div class="card c6"><div class="k">节省 token</div><div class="v" id="v-saved">—</div><div class="n">压缩节省</div></div>
+    <div class="card c4"><div class="k">缓存命中 token</div><div class="v" id="v-cached">—</div><div class="n" id="n-cached">命中率 —</div><div class="bar"><i id="bar-hit" style="width:0%"></i></div></div>
+    <div class="card c5"><div class="k">输出 token</div><div class="v" id="v-output">—</div><div class="n">累计输出</div></div>
+    <div class="card c6"><div class="k">压缩块</div><div class="v" id="v-blocks">—</div><div class="n">folds</div></div>
+    <div class="card c7"><div class="k">压缩节省 token</div><div class="v" id="v-saved">—</div><div class="n">tokensSaved</div></div>
+    <div class="card c8"><div class="k">净节省 token</div><div class="v" id="v-netsaved">—</div><div class="n">netSavedTotal</div></div>
     <div class="card c7"><div class="k">实际花费</div><div class="v" id="v-cost">—</div><div class="n">USD</div></div>
     <div class="card c8"><div class="k">压缩节省</div><div class="v" id="v-savedusd">—</div><div class="n">USD</div></div>
+    <div class="card c2"><div class="k">回本比</div><div class="v" id="v-payback">—</div><div class="n" id="n-payback">花费 — / 节省 —</div></div>
+    <div class="card c1"><div class="k">缓存未中</div><div class="v" id="v-miss">—</div><div class="n" id="n-miss">新 — / 补偿 — / TTL —</div></div>
   </div>
 
   <div class="sect">
     <h3>协议分布</h3>
-    <table><thead><tr><th>协议</th><th>会话</th><th>请求</th><th>命中率</th><th>节省 (USD)</th></tr></thead>
+    <table><thead><tr><th>协议</th><th>会话</th><th>请求</th><th>命中率</th><th>压缩次数</th><th>节省 (USD)</th></tr></thead>
     <tbody id="tb-protos"><tr><td colspan="5" class="pct">加载中…</td></tr></tbody></table>
   </div>
 
   <div class="sect">
     <h3>近期会话</h3>
-    <table><thead><tr><th>状态</th><th>会话</th><th>请求</th><th>上下文</th><th>命中</th><th>模型</th></tr></thead>
+    <table><thead><tr><th>状态</th><th>会话</th><th>请求</th><th>上下文</th><th>命中</th><th>节省</th><th>模型</th></tr></thead>
     <tbody id="tb-recent"><tr><td colspan="6" class="pct">加载中…</td></tr></tbody></table>
   </div>
 
@@ -241,32 +245,44 @@ function setHealth(hitPct){
 function render(o, meta){
   document.getElementById("sub").textContent =
     "billion-context · " + (meta && meta.version ? "v" + meta.version : "") + (meta && meta.origin ? " · " + meta.origin.replace(/^https?:\/\//,"") : "");
+  const pay = o.paybackUsdTotal || {};
+  const miss = o.missSplitUsdTotal || {};
   document.getElementById("v-sessions").textContent = fmt(o.sessions);
   document.getElementById("n-sessions").textContent = "live " + fmt(o.live) + " / total " + fmt(o.sessions);
   document.getElementById("v-requests").textContent = fmt(o.requests);
   document.getElementById("v-input").textContent = fmt(o.inputTokens);
+  document.getElementById("v-output").textContent = fmt(o.outputTokens);
   document.getElementById("v-cached").textContent = fmt(o.cachedTokens);
   document.getElementById("n-cached").textContent = "命中率 " + (o.hitPct ?? "—") + "%";
   document.getElementById("bar-hit").style.width = Math.min(100, Number(o.hitPct || 0)) + "%";
   document.getElementById("v-blocks").textContent = fmt(o.blocks ?? o.foldsTotal);
   document.getElementById("v-saved").textContent = fmt(o.tokensSaved);
+  document.getElementById("v-netsaved").textContent = fmt(o.netSavedTotal);
   document.getElementById("v-cost").textContent = fmtUsd(o.costUsdTotal);
   document.getElementById("v-savedusd").textContent = fmtUsd(o.savedUsdTotal);
+  document.getElementById("v-payback").textContent =
+    pay.saved ? (Number(pay.saved) / Math.max(0.01, Number(pay.spent || 1))).toFixed(0) + "×" : "—";
+  document.getElementById("n-payback").textContent =
+    "花费 " + fmtUsd(pay.spent) + " / 节省 " + fmtUsd(pay.saved);
+  document.getElementById("v-miss").textContent = fmt(o.missInputTotal);
+  document.getElementById("n-miss").textContent =
+    "新 " + fmt(o.missNewTotal) + " / 补偿 " + fmt(o.missCompTotal) + " / TTL " + fmt(o.missTtlTotal);
   setHealth(Number(o.hitPct || 0));
 
   const protos = o.byProtocol || [];
   const tp = document.getElementById("tb-protos");
-  if(!protos.length){ tp.innerHTML = '<tr><td colspan="5" class="pct">无协议数据</td></tr>'; }
+  if(!protos.length){ tp.innerHTML = '<tr><td colspan="6" class="pct">无协议数据</td></tr>'; }
   else tp.innerHTML = protos.map(p =>
-    `<tr><td>${p.protocol || "?"}</td><td>${fmt(p.sessions)}</td><td>${fmt(p.requests)}</td><td>${p.hitPct ?? "-"}%</td><td>${fmtUsd(p.savedUsd)}</td></tr>`).join("");
+    `<tr><td>${p.protocol || "?"}</td><td>${fmt(p.sessions)}</td><td>${fmt(p.requests)}</td><td>${p.hitPct ?? "-"}%</td><td>${fmt(p.folds)}</td><td>${fmtUsd(p.savedUsd)}</td></tr>`).join("");
 
   const recents = o.recent || [];
   const tr = document.getElementById("tb-recent");
-  if(!recents.length){ tr.innerHTML = '<tr><td colspan="6" class="pct">暂无会话记录</td></tr>'; }
-  else tr.innerHTML = recents.slice(0, 8).map(s =>
+  if(!recents.length){ tr.innerHTML = '<tr><td colspan="7" class="pct">暂无会话记录</td></tr>'; }
+  else tr.innerHTML = recents.slice(0, 12).map(s =>
     `<tr><td>${s.live ? '<span class="dot-live"></span>live' : '<span class="dot-off"></span>off'}</td>` +
     `<td>${(s.title || s.id || "").slice(0, 40)}</td><td>${fmt(s.requests)}</td>` +
-    `<td>${fmt(s.contextTokens)} tok</td><td>${s.cacheHitPct ?? "-"}%</td><td class="pct">${(s.model || "").slice(0, 32)}</td></tr>`).join("");
+    `<td>${fmt(s.contextTokens)} tok</td><td>${s.cacheHitPct ?? "-"}%</td>` +
+    `<td>${fmt(s.tokensSaved)}</td><td class="pct">${(s.model || "").slice(0, 32)}</td></tr>`).join("");
 
   document.getElementById("refresh").textContent = "更新 " + new Date().toLocaleTimeString("zh-CN");
 }
@@ -291,16 +307,22 @@ async function viaFetch(){
   return await r.json();
 }
 
+const EMBEDDED = @@OVERVIEW_JSON@@;
 async function boot(){
-  let d = null, lastErr = null;
-  for(const fn of [viaApp, viaFetch]){
-    try{ d = await fn(); if(d && (d.overview || d.sessions !== undefined)) break; }
-    catch(e){ lastErr = e; }
+  let d = null, lastErr = null, src = "";
+  if(EMBEDDED && (EMBEDDED.overview || EMBEDDED.sessions !== undefined)){
+    d = EMBEDDED; src = "embedded";
+  }
+  if(!d){
+    for(const [fn, tag] of [[viaApp, "mcp"], [viaFetch, "fetch"]]){
+      try{ const r = await fn(); if(r && (r.overview || r.sessions !== undefined)){ d = r; src = tag; break; } }
+      catch(e){ lastErr = e; }
+    }
   }
   if(!d){ showError(lastErr ? String(lastErr.message || lastErr) : "未知错误"); return; }
   document.getElementById("err").style.display = "none";
   const o = d.overview || d;
-  render(o, { version: d.version, origin: d.origin });
+  render(o, { version: d.version, origin: d.origin, src });
 }
 
 function openWeb(){
@@ -319,7 +341,8 @@ async function init(){
   }
   await boot();
   if(POLL) clearInterval(POLL);
-  POLL = setInterval(boot, 8000);
+  let first = true;
+  POLL = setInterval(async () => { if(first){ first = false; return; } await boot(); }, 8000);
 }
 document.addEventListener("DOMContentLoaded", init);
 </script>

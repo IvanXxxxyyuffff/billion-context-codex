@@ -205,6 +205,13 @@ def main():
             except OSError as e:
                 error(rid, -32603, f"cannot read ui: {e}")
                 continue
+            # 首屏数据内嵌：沙箱 CSP 禁 fetch，SDK 连接也慢 —— 服务端直接把 overview 烤进 HTML
+            try:
+                snapshot = bili_http("/__bili/overview")
+                baked = json.dumps(snapshot, ensure_ascii=False).replace("</", "<\\/")
+            except Exception:
+                baked = "null"
+            html = html.replace("@@OVERVIEW_JSON@@", baked)
             reply(rid, {"contents": [{
                 "uri": UI_URI, "mimeType": UI_MIME, "text": html,
                 "_meta": {
