@@ -67,6 +67,7 @@ tr:hover td{background:rgba(255,255,255,.028)}
 </style>
 </head>
 <body>
+<iframe id="bili-frame" title="billion-context Web UI" src="http://127.0.0.1:8790/__bili/" style="display:none" referrerpolicy="no-referrer"></iframe>
 <div class="wrap">
   <div class="h">
     <h2>上下文管理看板</h2>
@@ -135,6 +136,9 @@ tr:hover td{background:rgba(255,255,255,.028)}
 .card.plain{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:22px}
 .card.plain h3{margin-top:0}
 .card.plain::before{display:none}
+#bili-frame{position:fixed;inset:0;width:100vw;height:100vh;border:0;z-index:9;background:var(--bg)}
+body.frame-mode #bili-frame{display:block}
+body.frame-mode .wrap{display:none}
 .proto{display:inline-flex;padding:2px 8px;border-radius:999px;border:1px solid var(--sky);color:var(--sky);font-size:12px}
 .kv{display:grid;gap:10px;margin:0}
 .kvrow{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:baseline}
@@ -409,9 +413,17 @@ container holding the app. Specify either width or maxWidth, and either height o
     }
   }
 
+  function tryEmbed(){
+    const fr=document.getElementById("bili-frame");
+    if(!fr) return;
+    const ok=()=>{ try{ const href=fr.contentWindow.location.href; return !!href && href.startsWith("http"); }catch(e){ return true; } };
+    fr.addEventListener("load", ()=>{ if(ok()) document.body.classList.add("frame-mode"); });
+    setTimeout(()=>{ if(!ok()){ fr.remove(); } }, 5000);
+  }
   async function init(){
     $("openweb").addEventListener("click", e => { e.preventDefault(); openWeb(); });
     await boot();
+    tryEmbed();
     try{ await getApps(); }catch(e){}
     if(window.__POLL__) clearInterval(window.__POLL__);
     let first = true;
