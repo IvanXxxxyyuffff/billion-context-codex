@@ -1,6 +1,6 @@
 {
   "name": "bili-panel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "billion-context 上下文管理看板：会话/token/缓存命中率/压缩块/节省量一屏看完。",
   "author": {
     "name": "bili-panel"
